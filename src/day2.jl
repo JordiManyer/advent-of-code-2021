@@ -6,7 +6,7 @@ Given a path given by an input array of commands (direction + integer),
 compute the final position relative to the start.
 
 Problem 2: 
-Same, but using the convolution of the signal with a 3-position rectangular window.
+Same, but changing slightly the rules.
 
 """
 
