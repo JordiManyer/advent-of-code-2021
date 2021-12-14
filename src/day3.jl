@@ -18,6 +18,7 @@ function readInput() :: Array{Array{Bool,1},1}
   return map( y -> map(x -> parse(Bool,x), collect(y)), eachline(f))
 end
 
+# Converts from binary to decimal (binary given as array of bools). 
 function toInt(v :: Array{Bool,1}) 
   num = 0
   for i in 1:length(v)
@@ -26,22 +27,23 @@ function toInt(v :: Array{Bool,1})
   return num
 end
 
+# Given a set of arrays of bools, returns an array of the most common digit in each position.
 function rates(data :: Array{Array{Bool,1},1}) 
   counts = zeros(length(data[1]))
   for dd in data
     counts += map(x-> x ? 1 : -1, dd)
   end
-  println(counts)
   return map(x -> x >= 0 ? true : false, counts), map(x -> x >= 0 ? false : true, counts)
 end
 
 
-
+# Same as rates, but for only for position 'i'.
 function nextBit(dd, i :: Int) :: Bool
   counts = sum(map(x -> x[i] ? 1 : -1, dd))
   return (counts >= 0 ? true : false)
 end
 
+# Solves problem 2
 function rates2(data :: Array{Array{Bool,1},1}) 
   
   gamma = deepcopy(data)

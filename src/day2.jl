@@ -19,7 +19,7 @@ function readInput() :: Array{Tuple{String,Int}}
   return data
 end
 
-
+# Converts direction from string to cartesian index.
 function toIndex(s::String)
   if s == "up"
     return CartesianIndex(0,-1)
@@ -32,6 +32,7 @@ function toIndex(s::String)
   end
 end
 
+# Follows a path given by an array of steps (distance + direction). Return final position.
 function followPath(path:: Array{Tuple{String,Int}}) :: CartesianIndex{2}
   pos = CartesianIndex(0,0)
   for step in path
@@ -40,6 +41,7 @@ function followPath(path:: Array{Tuple{String,Int}}) :: CartesianIndex{2}
   return pos
 end
 
+# Modified version for the second part of the problem. 
 function followPath2(path:: Array{Tuple{String,Int}}) :: CartesianIndex{2}
   aim = 0
   pos = CartesianIndex(0,0)

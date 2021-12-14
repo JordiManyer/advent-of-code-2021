@@ -1,6 +1,6 @@
 using DataStructures
 
-
+# Returns all neighboring positions of 'pos'. 
 function getNbors(M::Matrix{Int}, pos::CartesianIndex{2}) :: Vector{CartesianIndex{2}}
   s = size(M)
   nbors :: Vector{CartesianIndex{2}} = []
@@ -11,7 +11,7 @@ function getNbors(M::Matrix{Int}, pos::CartesianIndex{2}) :: Vector{CartesianInd
   return nbors
 end
 
-
+# Calculates all low points for a given height map. 
 function lowPts(M::Matrix{Int}) :: Vector{CartesianIndex{2}}
   s = size(M)
   lpts :: Vector{CartesianIndex{2}} = []
@@ -25,11 +25,11 @@ function lowPts(M::Matrix{Int}) :: Vector{CartesianIndex{2}}
   return lpts
 end
 
+# Computes risk level of a position.
 riskLevel(M::Matrix{Int}, pos::CartesianIndex{2}) :: Int = M[pos] + 1
-
 riskLevel(M::Matrix{Int}, pos::Vector{CartesianIndex{2}}) :: Int = sum(map(p -> riskLevel(M,p), pos))
 
-
+# Calculates all basins, given the set of low points. 
 function basins(M::Matrix{Int}, lpts::Vector{CartesianIndex{2}}) :: Vector{Int}
   visited :: Matrix{Int} = -ones(size(M))
 

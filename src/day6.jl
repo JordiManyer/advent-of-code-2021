@@ -1,5 +1,6 @@
 using DelimitedFiles
 
+# Lanternfish pack structure
 mutable struct Lanternfish
   days:: Int
   n :: Int
@@ -14,6 +15,7 @@ function Lanternfish(fish::Vector{Int})
   return Lanternfish(0,n,groups)
 end
 
+# One-day reproduction cycle. 
 function nextDay!(lf::Lanternfish)
   permute!(lf.groups,[2,3,4,5,6,7,8,9,1])
   lf.groups[7] += lf.groups[9]
@@ -21,6 +23,7 @@ function nextDay!(lf::Lanternfish)
   lf.days += 1
 end
 
+# Advance reproduction cycle several days.
 function nextDays!(lf::Lanternfish,nDays::Int) 
   for i in 1:nDays
     nextDay!(lf)

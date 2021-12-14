@@ -1,11 +1,12 @@
 
-
+# Board struct 
 struct Board
   n :: Int
   lines :: Vector{Line}
   cells :: Matrix{Int}
 end
 
+# Creates board that can hold the given lines. 
 function Board(lines::Vector{Line})
   n = maximum(map(l -> max(l.startPt[1],l.startPt[2],l.endPt[1],l.endPt[2]),lines))
   return Board(n,lines,zeros(Int,(n,n)))
@@ -13,12 +14,14 @@ end
 
 ############################################################################################
 
+# Line struct
 struct Line
   startPt :: CartesianIndex{2}
   endPt   :: CartesianIndex{2}
   points  :: Vector{CartesianIndex{2}}
 end
 
+# Creates line from the two endpoints.
 function Line(p1::CartesianIndex{2}, p2::CartesianIndex{2})
   slope = (p2-p1)
   npts = max(abs(slope[1]), abs(slope[2]))
@@ -27,6 +30,7 @@ function Line(p1::CartesianIndex{2}, p2::CartesianIndex{2})
   return Line(p1, p2, pts)
 end
 
+# Check line properties
 isHorizontal(l::Line) :: Bool = (l.startPt[1] == l.endPt[1])
 isVertical(l::Line)   :: Bool = (l.startPt[2] == l.endPt[2])
 isFlat(l::Line)       :: Bool = isHorizontal(l) || isVertical(l)
@@ -57,12 +61,14 @@ end
 
 ############################################################################################
 
+# Draw a single line into a matrix
 function add!(line::Line, M::Matrix{Int})
   for p in line.points
     M[p] += 1
   end
 end
 
+# Draw all lines in a board
 function drawLines!(b::Board)
   map(l -> add!(l,b.cells), b.lines)
 end
@@ -72,7 +78,7 @@ end
 lines = readInput()
 
 # Problem 1
-lines1 = deepcopy(filter(isFlat, lines))
+lines1 = deepcopy(filter(isFlat, lines)) # Only consider flat lines
 board1 = Board(lines1)
 drawLines!(board1)
 res = count( map( x -> (x > 1) ? true : false, board1.cells))

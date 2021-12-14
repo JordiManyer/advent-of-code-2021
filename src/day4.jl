@@ -1,6 +1,7 @@
 using DelimitedFiles
 import Base.size 
 
+# Bingo struct
 mutable struct Bingo
   n ::Int
   nums :: Matrix{Int}
@@ -15,6 +16,7 @@ size(b::Bingo) :: Int = b.n
 row(b::Bingo, i::Int) :: Vector{Bool} = b.mask[i,:]
 col(b::Bingo,i::Int) :: Vector{Bool} = b.mask[:,i]
 
+# Returns true if the bingo is complete. 
 function bingo(b::Bingo) :: Bool
   res = false
   for i in 1:size(b)
@@ -23,6 +25,7 @@ function bingo(b::Bingo) :: Bool
   return res
 end
 
+# Adds number appearance to bingo. 
 function newNum!(num::Int, b::Bingo)
   ind = findall(x -> x == num, b.nums)
   if length(ind) > 0
@@ -30,11 +33,12 @@ function newNum!(num::Int, b::Bingo)
   end
 end
 
+# Returns the score of a bingo board. 
 function score(b::Bingo)
   return sum(b.nums[map(x->!x,b.mask)])
 end
 
-
+# Returns the score of the first bingo to be complete. 
 function playBingo!(nums::Vector{Int}, bingos::Vector{Bingo}) :: Int
   for num in nums
     println("New num: ", num)
@@ -51,7 +55,7 @@ function playBingo!(nums::Vector{Int}, bingos::Vector{Bingo}) :: Int
   return -1 
 end
 
-
+# Returns the score of the last bingo to be complete. 
 function lastBingo!(nums::Vector{Int}, bingos::Vector{Bingo}) :: Int
   lastRound :: Vector{Bool} = zeros(length(bingos))
   for num in nums
