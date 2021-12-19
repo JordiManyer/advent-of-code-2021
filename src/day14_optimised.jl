@@ -10,15 +10,12 @@ end
 
 function Compound(word::String,rules::Array{Int16},patterns::Array{String},letters::Array{Char})
   chains :: Array{Tuple{Int16,Int16}} = []
-  for iR in 1:length(rules)
-    
+  for iR in 1:length(rules) # The rule AB -> C will create two new patterns (AC,CB)
+    pattern1 = string(patterns[iR][1],letters[rules[iR]])
+    pattern2 = string(letters[rules[iR]], patterns[iR][2])
+    push!(chains,(findfirst(isequal(pattern1),patterns), findfirst(isequal(pattern2),patterns)))
   end
   return Compound(word, rules, patterns, letters, chains)
-end
-
-function step!(c::Compound)
-  pieces = map(i -> c.rules[c.word[i:i+1]], 1:length(c.word)-1)
-  c.word = string(pieces...,c.word[end])
 end
 
 function parseLine(line::String) :: Pair{String,String}
@@ -56,14 +53,62 @@ function readInput()
   return Compound(word,rules,patterns,letters)
 end
 
+############################################################################################
+# Non-optimised way of solving the problem. 
+
+function steps!(nSteps::Int, pattern::Int16, c::Compound, cnter::Array{Int})
+  (nSteps == 0) && return
+
+  cnter[c.rules[pattern]] += 1
+  steps!(nSteps-1,c.chains[pattern][1],c,cnter)
+  steps!(nSteps-1,c.chains[pattern][2],c,cnter)
+end
+
+
+function solve(nSteps::Int, c::Compound)
+  cnter :: Array{Int} = map(l -> count(x->x==l,c.word), c.letters)
+  for i in 1:length(c.word)-1
+    pattern :: Int16 = findfirst(isequal(c.word[i:i+1]), c.patterns)
+    steps!(nSteps, pattern, c, cnter)
+  end
+  return maximum(cnter) - minimum(cnter)
+end
+
+############################################################################################
+# Optimised procedure: Just count the total number of each pattern and update at each step. 
+
+function dostep(c::Compound, cnter::Array{Int}) :: Array{Int}
+  newCnter :: Array{Int} = fill(0,length(cnter))
+  for i in 1:length(c.patterns)
+    newCnter[c.chains[i][1]] += cnter[i]
+    newCnter[c.chains[i][2]] += cnter[i]
+  end
+  return newCnter
+end
+
+function solve2(nSteps::Int, c::Compound)
+  cnter :: Array{Int} = fill(0,length(c.patterns))
+  for i in 1:length(c.word)-1
+    pattern :: Int16 = findfirst(isequal(c.word[i:i+1]), c.patterns)
+    cnter[pattern] += 1
+  end
+  for i in 1:nSteps
+    cnter = dostep(c,cnter)
+  end
+  res :: Array{Int} = fill(0,length(c.letters))
+  for i in 1:length(cnter)
+    letter = first(c.patterns[i])
+    res[findfirst(isequal(letter),c.letters)] += cnter[i]
+  end
+  res[findfirst(isequal(c.word[end]),c.letters)] += 1
+  return maximum(res) - minimum(res)
+end
+
+
+############################################################################################
 myCompound = readInput()
 
 nSteps = 40
-for i in 1:nSteps
-  println(i)
-  step!(myCompound)
-end
-
-cnt = counter(myCompound.word)
-
-display(maximum(x->x.second,cnt)-minimum(x->x.second,cnt)) 
+res = solve2(nSteps,myCompound)
+# res = solve(nSteps,myCompound)
+println(res)
