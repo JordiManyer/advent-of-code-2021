@@ -88,7 +88,7 @@ function parseOperator(s::String) :: Tuple{OperatorPacket,Int}
     end
   else
     numPackets :: Int = toInt(s[8:18])
-    pos = 20
+    pos = 19
     for i in 1:numPackets
       println(pos, " - ", s[pos:end])
       packet, step = parsePacket(s[pos:end])
@@ -100,12 +100,49 @@ function parseOperator(s::String) :: Tuple{OperatorPacket,Int}
   return OperatorPacket(version, type, length(packets), packets), pos  
 end
 
-function readInput()
-  s = readline("inputs/day16.txt")
-  data = parsePacket(s)
+
+
+versionSum(p::NumberPacket) :: Int = p.version
+
+versionSum(p::OperatorPacket) :: Int = p.version + sum(map(x -> versionSum(x), p.packets))
+
+compute(p::NumberPacket) :: Int = p.value
+
+function compute(p::OperatorPacket) :: Int 
+  if p.type == 0
+    return sum(map(x->compute(x), p.packets))
+  elseif p.type == 1
+    return prod(map(x->compute(x), p.packets))
+  elseif p.type == 2
+    return minimum(map(x->compute(x), p.packets))
+  elseif p.type == 3
+    return maximum(map(x->compute(x), p.packets))
+  elseif p.type == 5
+    return (compute(p.packets[1]) > compute(p.packets[2])) ? (return 1) : (return 0)
+  elseif p.type == 6
+    return (compute(p.packets[1]) < compute(p.packets[2])) ? (return 1) : (return 0)
+  elseif p.type == 7
+    return (compute(p.packets[1]) == compute(p.packets[2])) ? (return 1) : (return 0)
+  else 
+    @error "Operator type not recognised!"
+  end
 end
 
 
+function readInput()
+  hex = readline("inputs/day16.txt")
+  bin = hex2bin(hex)
+  data, pos = parsePacket(bin)
+  return data
+end
 
 
-parseNumber("110100101111111000101000")
+p = readInput()
+
+println("Problem 1:")
+res = versionSum(p)
+println(res)
+
+prinln("Problem 2:")
+res = compute(p)
+println(res)
